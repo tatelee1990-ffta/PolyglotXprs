@@ -8,6 +8,12 @@ from aTrain.components.dialogs.error import dialog_error
 from aTrain_core.globals import MODELS_DIR, REQUIRED_MODELS_DIR
 from aTrain_core.integrity import find_missing_files
 from aTrain_core.load_resources import get_model, load_model_config_file, remove_model
+from aTrain_core.model_source import (
+    ModelSourceError,
+    configured_source,
+    is_url,
+    model_location,
+)
 from aTrain_core.settings import load_languages
 from huggingface_hub.utils import get_session
 from nicegui import run, ui
@@ -65,12 +71,7 @@ def read_model_metadata() -> list:
             "group": model_metadata[model].get("group", "All others"),
             "size": model_metadata[model]["repo_size_human"],
             "downloaded": model in downloaded_models,
-            # Only Hugging Face for now; an internal source (#322) goes here.
-            "source": "Hugging Face",
-            "source_url": (
-                f"https://huggingface.co/{model_metadata[model]['repo_id']}"
-                f"/tree/{model_metadata[model]['revision']}"
-            ),
+            **model_source_info(model, model_metadata[model]),
         }
         if info := model_metadata[model].get("info"):
             model_info["info"] = info
@@ -79,6 +80,29 @@ def read_model_metadata() -> list:
     all_models_metadata = sorted(all_models_metadata, key=lambda x: x["downloaded"], reverse=True)
 
     return all_models_metadata
+
+
+def model_source_info(model: str, model_config: dict) -> dict:
+    """Where a model is downloaded from, for the Models page.
+
+    With ATRAIN_MODEL_SOURCE set (#322) that is the internal source. A folder
+    source gets no link, since a browser window cannot open a network share.
+    """
+    if source := configured_source():
+        try:
+            info = {"source": f"Internal source ({model_location(source, model)})"}
+            if is_url(source):
+                info["source_url"] = model_location(source, model)
+        except ModelSourceError as error:
+            # Show a misconfiguration on the page instead of failing to render it.
+            info = {"source": f"Invalid internal source: {error}"}
+        return info
+    return {
+        "source": "Hugging Face",
+        "source_url": (
+            f"https://huggingface.co/{model_config['repo_id']}/tree/{model_config['revision']}"
+        ),
+    }
 
 
 def model_languages(model: str) -> dict:
@@ -100,7 +124,10 @@ async def download_model(model: str):
         progress = manager.dict({"current": 0, "total": 999999})
         dialog_download(progress, model)
         try:
-            check_internet()
+            # An internal source is checked by the download itself; Hugging Face
+            # must not be contacted at all when one is configured.
+            if not configured_source():
+                check_internet()
             await run.cpu_bound(get_model, model=model, progress=progress)
             close_dialog_download()
             ui.navigate.reload()
