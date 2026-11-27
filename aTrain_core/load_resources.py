@@ -10,7 +10,13 @@ from huggingface_hub import file_download, snapshot_download
 from tqdm.auto import tqdm
 
 from aTrain_core.globals import MODELS_DIR, REQUIRED_MODELS, REQUIRED_MODELS_DIR
-from aTrain_core.integrity import ModelIntegrityError, find_missing_files, verify_model
+from aTrain_core.integrity import (
+    OPTIONAL_FILES,
+    ModelIntegrityError,
+    find_missing_files,
+    verify_model,
+)
+from aTrain_core.model_source import configured_source, download_from_source
 
 
 class custom_tqdm(tqdm):
@@ -32,6 +38,20 @@ def download_all_models():
 
 
 def download_model(model_path: Path, model_info: dict, progress: DictProxy | None = None):
+    # With ATRAIN_MODEL_SOURCE set, models come only from the internal source and
+    # Hugging Face is never contacted (docs/internal-model-source.md).
+    # The model's folder name is its key in models.json, as at the source.
+    if source := configured_source():
+        download_from_source(
+            source,
+            model_path.name,
+            model_path,
+            model_info["files"],
+            progress,
+            total_bytes=model_info.get("repo_size"),
+        )
+        return
+
     # http_get and xet_get are patched module-wide so the byte progress of
     # every file lands in one bar, whichever path the Hub serves it through. It has to be restored afterwards: the pool worker outlives this
     # call, and the proxy behind the bar dies with the dialog that opened it.
@@ -75,7 +95,14 @@ def get_model(model: str, progress: DictProxy | None = None) -> Path:
     # `model_path.exists()` test would consider the model present from then on.
     if not model_path.exists() or find_missing_files(model_path, manifest):
         download_model(model_path, model_info, progress)
-        problems = verify_model(model_path, manifest)
+        # Optional files (.gitattributes) may be absent, e.g. at an internal
+        # source filled from a bundled model (#335); every other file is checked.
+        to_verify = {
+            name: digest
+            for name, digest in manifest.items()
+            if name not in OPTIONAL_FILES or (model_path / name).is_file()
+        }
+        problems = verify_model(model_path, to_verify)
         if problems:
             message = _integrity_message(model, model_path, problems)
             # Discard it here rather than leaving that to the caller: a model

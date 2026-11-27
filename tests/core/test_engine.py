@@ -17,9 +17,14 @@ def key(model: str) -> ModelKey:
 
 @pytest.mark.parametrize(
     ("model", "backend"),
-    [("tiny", "faster-whisper"), ("crisperwhisper-v2-large", "crisper-transformers")],
+    [("tiny", "faster-whisper"), ("crisper-test-model", "crisper-transformers")],
 )
 def test_load_transcriber_picks_backend_from_models_json(monkeypatch, model, backend):
+    # The fork ships no CrisperWhisper model (non-commercial licence), so the
+    # crisper backend is exercised with a config entry injected for the test.
+    config = engine.load_model_config_file()
+    config["crisper-test-model"] = {"backend": "crisper-transformers"}
+    monkeypatch.setattr(engine, "load_model_config_file", lambda: config)
     calls = []
 
     class Fake:
@@ -37,10 +42,11 @@ def test_load_transcriber_rejects_unknown_backend():
         engine.load_transcriber(key("speaker-detection"), Path("/models/x"))
 
 
-def test_validate_job_settings_rejects_crisper_auto_detect():
-    validate_job_settings("crisperwhisper-v2-large", "de", Device.CPU)
+def test_validate_job_settings_rejects_auto_detect_for_fixed_language_models():
+    # large-swedish lists only "sv", so auto-detect must be rejected for it.
+    validate_job_settings("large-swedish", "sv", Device.CPU)
     with pytest.raises(ValueError):
-        validate_job_settings("crisperwhisper-v2-large", "auto-detect", Device.CPU)
+        validate_job_settings("large-swedish", "auto-detect", Device.CPU)
 
 
 def word(text, start, end):

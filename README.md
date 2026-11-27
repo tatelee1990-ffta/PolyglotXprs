@@ -1,5 +1,20 @@
 <img src="docs/images/logo.svg" width="300" alt="aTrain logo">
 
+> **PolyglotXprs: offline multilingual transcription, based on aTrain.**
+>
+> PolyglotXprs is a fork of [aTrain](https://github.com/JuergenFleiss/aTrain) by the
+> Business Analytics and Data Science-Center, University of Graz, licensed under AGPL-3.0.
+> It is not affiliated with or endorsed by the aTrain team.
+>
+> **Status: untested base build, published for testing only.** Do not use it for
+> real or sensitive recordings yet. Test with synthetic or public audio.
+>
+> It adds an internal model source (`ATRAIN_MODEL_SOURCE`) so organisations can load
+> models once from their own server and Hugging Face is never contacted, and it offers
+> only models under permissive open-source licences. See [docs/fork.md](docs/fork.md)
+> for all changes and the roadmap, and
+> [docs/internal-model-source.md](docs/internal-model-source.md) for administrators.
+
 ## Accessible Transcription of Interviews
 aTrain is a tool for automatically transcribing speech recordings utilizing state-of-the-art machine learning models without uploading any data. It was developed by researchers at the Business Analytics and Data Science-Center at the University of Graz and tested by researchers from the Know-Center Graz.
 

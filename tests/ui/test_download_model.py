@@ -83,3 +83,23 @@ async def test_failed_download_removes_the_folder_it_created(models_dir, monkeyp
     await models.download_model("large-v3-turbo")
 
     assert not (models_dir / "large-v3-turbo").exists(), "the failed download left its folder"
+
+
+async def test_internal_source_skips_the_hugging_face_check(models_dir, monkeypatch):
+    # With ATRAIN_MODEL_SOURCE set, aTrain must not contact Hugging Face at all,
+    # not even for the reachability check before a download.
+    monkeypatch.setenv("ATRAIN_MODEL_SOURCE", str(models_dir / "source"))
+    started = []
+
+    def hub_check():
+        raise AssertionError("check_internet() contacted Hugging Face")
+
+    async def download(func, *args, model, **kwargs):
+        started.append(model)
+
+    monkeypatch.setattr(models, "check_internet", hub_check)
+    monkeypatch.setattr(run, "cpu_bound", download)
+
+    await models.download_model("large-v3-turbo")
+
+    assert started == ["large-v3-turbo"]

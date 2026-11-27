@@ -8,6 +8,8 @@ Older releases are listed on the [GitHub releases page](https://github.com/aTrai
 
 ### Added
 
+- Fork: `ATRAIN_MODEL_SOURCE` loads models from an internal network share or web server; Hugging Face is never contacted when it is set (#322).
+- Fork: a test enforces that `models.json` only offers models under MIT, Apache-2.0, BSD or CC-BY-4.0.
 - New crisper_whisper transformers backend.
 - File upload and download in browser (no-native) mode.
 - Downloaded models are checked against pinned per-file hashes.
@@ -18,6 +20,7 @@ Older releases are listed on the [GitHub releases page](https://github.com/aTrai
 
 ### Changed
 
+- Fork: CrisperWhisper is no longer offered, as its weights are licensed for non-commercial research only.
 - Improved model manager layout.
 - Engine split into reusable steps (groundwork for batch transcription).
 - NiceGUI upgraded to 3.x.
