@@ -1,212 +1,166 @@
-<img src="docs/images/logo.svg" width="300" alt="aTrain logo">
+# PolyglotXprs
 
-> **PolyglotXprs: offline multilingual transcription, based on aTrain.**
->
-> PolyglotXprs is a fork of [aTrain](https://github.com/JuergenFleiss/aTrain) by the
-> Business Analytics and Data Science-Center, University of Graz, licensed under AGPL-3.0.
-> It is not affiliated with or endorsed by the aTrain team.
->
-> **Status: untested base build, published for testing only.** Do not use it for
-> real or sensitive recordings yet. Test with synthetic or public audio.
->
-> It adds an internal model source (`ATRAIN_MODEL_SOURCE`) so organisations can load
-> models once from their own server and Hugging Face is never contacted, and it offers
-> only models under permissive open-source licences. See [docs/fork.md](docs/fork.md)
-> for all changes and the roadmap, and
-> [docs/internal-model-source.md](docs/internal-model-source.md) for administrators.
+Offline multilingual transcription with speaker detection, based on
+[aTrain](https://github.com/JuergenFleiss/aTrain).
 
-## Accessible Transcription of Interviews
-aTrain is a tool for automatically transcribing speech recordings utilizing state-of-the-art machine learning models without uploading any data. It was developed by researchers at the Business Analytics and Data Science-Center at the University of Graz and tested by researchers from the Know-Center Graz.
+> **Status: untested base build, published for testing only.** It passes the
+> automated test suite but has not yet been tried on Windows or with real
+> recordings. Do not use it for real or sensitive recordings yet. Test with
+> synthetic or public audio.
 
-## Get aTrain
-<p>
-  <a href="https://flathub.org/apps/io.github.juergenfleiss.aTrain">
-    <img height="58" alt="Get it on Flathub" src="https://flathub.org/api/badge?locale=en"></a>
-  &nbsp;&nbsp;
-  <a href="https://apps.microsoft.com/detail/9N15Q44SZNS2?mode=direct">
-    <img width="220" alt="Get it from Microsoft" src="https://get.microsoft.com/images/en-us%20dark.svg"></a>
-</p>
+PolyglotXprs is a fork of aTrain by the Business Analytics and Data
+Science-Center, University of Graz. It is not affiliated with or endorsed by
+the aTrain team. The application window still shows aTrain's name and logo;
+renaming the interface is planned.
 
-aTrain is published on Flathub for Linux and the Microsoft Store for Windows.  Additional download types [can be found here](https://business-analytics.uni-graz.at/de/forschung/atrain/download/).
+## What it does
 
-How release builds are signed: see the [Code signing policy](docs/code-signing-policy.md).
+- **Transcribes recordings entirely on your computer.** Recordings and
+  transcripts never leave it.
+- **Detects speakers** and labels them Speaker 1, Speaker 2 and so on.
+- **Covers 99 languages** through OpenAI's Whisper models (via
+  [faster-whisper](https://github.com/SYSTRAN/faster-whisper)). Accuracy varies
+  by language; see Whisper's
+  [per-language error rates](https://github.com/openai/whisper?tab=readme-ov-file#available-models-and-languages).
+- **Exports transcripts** as text, SRT subtitles and JSON, and in formats that
+  import into MAXQDA, ATLAS.ti and NVivo (see the [tutorial](docs/tutorials.md)).
+- **Runs on a CPU or an NVIDIA GPU.** A GPU is much faster.
 
+## How it differs from aTrain
 
-## About aTrain
+- **Internal model source.** Organisations can set `ATRAIN_MODEL_SOURCE` to a
+  network share or internal web server. Models are then loaded only from there,
+  and Hugging Face is never contacted. See the
+  [administrator guide](docs/internal-model-source.md).
+- **Only permissively licensed models.** Every model offered is under MIT,
+  Apache-2.0 or CC-BY-4.0. Models under non-commercial licences are removed, and
+  a test prevents them from returning through updates from aTrain.
+- **Planned:** more speech recognition engines (Qwen3-ASR, NVIDIA Parakeet),
+  choosing the best model for each speaker's language, and a step for reviewing
+  and correcting transcripts. See [docs/fork.md](docs/fork.md).
 
-aTrain offers the following benefits:
-\
-\
-**Fast and accurate 🚀**
-\
-aTrain provides a user friendly access to the [faster-whisper](https://github.com/guillaumekln/faster-whisper) implementation of OpenAI’s [Whisper model](https://github.com/openai/whisper), ensuring best in class transcription quality (see [Wollin-Geiring et al. 2023](https://www.static.tu.berlin/fileadmin/www/10005401/Publikationen_sos/Wollin-Giering_et_al_2023_Automatic_transcription.pdf)) paired with higher speeds on your local computer. Transcription when selecting the highest-quality model takes only around three times the audio length on current mobile CPUs typically found in middle-class business notebooks (e.g., Core i5 12th Gen, Ryzen Series 6000).
-\
-\
-**Speaker detection 🗣️**
-\
-aTrain has a speaker detection mode based on [pyannote.audio](https://github.com/pyannote/pyannote-audio) and can analyze each text segment to determine which speaker it belongs to.
-\
-\
-**Privacy Preservation and GDPR compliance 🔒**
-\
-aTrain processes the provided speech recordings completely offline on your own device and does not send recordings or transcriptions to the internet. This helps researchers to maintain data privacy requirements arising from ethical guidelines or to comply with legal requirements such as the GDPR.
-\
-\
-**Multi-language support 🌍**
-\
-aTrain-core can process speech recordings a total of 99 languages, including Afrikaans, Arabic, Armenian, Azerbaijani, Belarusian, Bosnian, Bulgarian, Catalan, Chinese, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, Galician, German, Greek, Hebrew, Hindi, Hungarian, Icelandic, Indonesian, Italian, Japanese, Kannada, Kazakh, Korean, Latvian, Lithuanian, Macedonian, Malay, Marathi, Maori, Nepali, Norwegian, Persian, Polish, Portuguese, Romanian, Russian, Serbian, Slovak, Slovenian, Spanish, Swahili, Swedish, Tagalog, Tamil, Thai, Turkish, Ukrainian, Urdu, Vietnamese, and Welsh. A full list can be found [here](https://github.com/openai/whisper/blob/main/whisper/tokenizer.py). Note that transcription quality varies with language; word error rates for the different languages can be found [here](https://github.com/openai/whisper?tab=readme-ov-file#available-models-and-languages).
-\
-\
-**MAXQDA, ATLAS.ti and nVivo compatible output 📄**
-\
-aTrain-core provides transcription files that are seamlessly importable into the most popular tools for qualitative analysis, ATLAS.ti, MAXQDA and nVivo. This allows you to directly play audio for the corresponding text segment by clicking on its timestamp. Go to the [tutorial](docs/tutorials.md) for MAXQDA and NVivo.
-\
-\
-**Nvidia GPU support 🖥️**
-\
-aTrain can either run on the CPU or an NVIDIA GPU (CUDA toolkit installation required). A [CUDA-enabled NVIDIA GPU](https://developer.nvidia.com/cuda-gpus) significantly improves the speed of transcriptions and speaker detection, reducing transcription time to 20% of audio length on current entry-level gaming notebooks.
+## Privacy and network use
 
-| Screenshot 1 | Screenshot 2 |
-| --- | --- |
-| ![Screenshot1](docs/images/screenshot_1.webp) | ![Screenshot2](docs/images/screenshot_2.webp) |
+- Audio and transcripts are processed and stored only on your computer.
+- The only network access is downloading models:
+  - by default, from the aTrain project's mirrors on Hugging Face, pinned to
+    exact versions;
+  - with `ATRAIN_MODEL_SOURCE` set, only from that source.
+- Every downloaded model file is checked against a SHA-256 hash stored in this
+  repository. Files that do not match are deleted.
+- Once the models you need are downloaded, the app makes no network requests
+  and works on a computer with no network connection.
+- Telemetry in the speaker detection library is switched off.
 
-## Benchmarks
-For testing the processing time of aTrain-core we transcribe a [conversation between Christine Lagarde and Andrea Enria at the Fifth ECB Forum on Banking Supervision 2023](https://www.youtube.com/watch?v=kd7e3OXkajY) published on YouTube by the European Central Bank under a Creative Commons license , downloaded as 320p MP4 video file. The file has a duration of exactly 22 minutes and was transcribed on different computing devices with speaker detection enabled. The figure below shows the processing time of each transcription.
+## Installing for testing
 
-Transcription Time (incl. speaker detection) for 00:22:00 File:
+There are no installers yet. Run it from source:
 
-| Computing Device       |  large-v3   | Distil large-v3   | large-v3-turbo |
-| ---                    | ---         | ---               | ---            |
-| CPU: Ryzen 6850U       | 00:26:12    | 00:13:30          | 00:18:30       |
-| CPU: Apple M1          | 00:33:15    | 00:21:40          | 00:??:??       |
-| CPU: Intel i9-10940X   | 00:10:25    | 00:04:36          | 00:??:??       |
-| CPU: Intel i7-8750H    | 00:??:??    | 00:??:??          | 00:19:16       |
-| GPU: RTX 2080 Ti       | 00:01:44    | 00:01:06          | 00:??:??       |
-| GPU: RTX 2070 Max-Q    | 00:05:59    | 00:??:??          | 00:04:37       |
+1. Install [Git](https://git-scm.com/), and
+   [uv](https://docs.astral.sh/uv/getting-started/installation/), which
+   installs a suitable Python by itself.
+2. Clone this repository: copy its URL from the green **Code** button, then
+   ```bash
+   git clone <repository URL>
+   cd PolyglotXprs
+   ```
+3. Install the dependencies (several GB, including PyTorch):
+   ```bash
+   uv sync --extra gui
+   ```
+4. Download the required models (Whisper large-v3-turbo and speaker detection):
+   ```bash
+   uv run aTrain init
+   ```
+5. Start the app:
+   ```bash
+   uv run aTrain start
+   ```
 
+The commands are still called `aTrain` and `aTrain_core`. Internal names are
+kept unchanged so updates from aTrain can be merged easily.
 
-## Headless / CLI Usage
+On Linux, the desktop window needs some system libraries first; see the
+"Linux: native GUI build dependencies" section of
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
-For headless transcription pipelines (servers, automation, scripts) aTrain
-is also installable via pip and exposes a CLI.
+## Command line
 
-### Install
-
-Until aTrain ships on PyPI, install directly from the GitHub repo. Engine
-only (CLI usage):
+Transcribe a file with the default model:
 
 ```bash
-pip install "aTrain @ git+https://github.com/aTrainTranscription/aTrain.git"
+uv run aTrain_core transcribe /path/to/recording.mp3
 ```
 
-For `aTrain start` (the desktop / browser app), add the GUI extras:
+With options:
 
 ```bash
-pip install "aTrain[gui] @ git+https://github.com/aTrainTranscription/aTrain.git"
+uv run aTrain_core transcribe /path/to/recording.mp3 \
+    --model large-v3 --language en \
+    --speaker-detection --speaker-count 2 \
+    --device gpu --compute-type float16
 ```
 
-On Windows, prepend the PyTorch CUDA index for the `cu128` torch wheel:
+`--language auto-detect` (the default) lets the model detect the language, and
+`--speaker-count 0` (the default) detects the number of speakers. `--device` is
+`cpu` (default) or `gpu`; `--compute-type` is `int8` (default), `float16` or
+`float32`. Run `uv run aTrain_core transcribe --help` for all options.
+
+Transcripts are saved in `Documents\aTrain\transcriptions` (Windows) or
+`~/Documents/aTrain/transcriptions`, as plain text, text with timestamps,
+MAXQDA and NVivo text formats, SRT subtitles and JSON.
+
+Manage models:
 
 ```bash
-pip install ... --extra-index-url https://download.pytorch.org/whl/cu128
+uv run aTrain init                # download the required models
+uv run aTrain_core load <MODEL>   # download one model
+uv run aTrain_core remove <MODEL> # delete one model
 ```
 
-On Linux the PyPI torch wheel already bundles CUDA; macOS is CPU-only.
-NVIDIA CUDA GPU support currently covers Windows and Debian-based Linux.
+### Models offered
 
-> 💡 **Linux + slow disk**: if `pip install` keeps killing the torch wheel
-> collection, retry with `--no-cache-dir`.
-
-When aTrain reaches PyPI (planned, not yet), the install command becomes
-`pip install aTrain` and `pip install 'aTrain[gui]'`.
-
-### Start in browser or server mode
-
-> ⚠️ **Experimental:** Running `aTrain start` as a headless browser/server app
-> is experimental. Some browser-mode functionality may still be incomplete.
-
-By default, `aTrain start` opens the native desktop app. Use `--no-native` to
-run it in browser mode. The following options are available for browser/server
-deployments:
-
-| Option | Description |
-| --- | --- |
-| `--no-native` | Run without a native desktop window. |
-| `--no-show` | Do not automatically open a browser tab. |
-| `--host HOST` | Bind to a specific IP address (default `127.0.0.1`). |
-| `--port PORT` | Listen on a specific port. |
-| `--allow-any-host` | Turn off the host and origin check, needed behind a reverse proxy on the same machine when binding to `127.0.0.1` or `localhost`. |
-
-For example, to run a server on port 8080 without opening a browser tab:
-
-```bash
-aTrain start --no-native --no-show --host 0.0.0.0 --port 8080
-```
-
-With any address other than `127.0.0.1` or `localhost`, aTrain does not check host names or origins. Put a reverse proxy with authentication in front of it.
-
-A guide for setting up aTrain as a service is available in the [Linux service guide](docs/linux/service.md).
-
-### Transcribe from the command line
-
-Default settings:
-
-```bash
-aTrain_core transcribe /path/to/audio/file.mp3
-```
-
-With overrides:
-
-```bash
-aTrain_core transcribe /path/to/audio/file.mp3 \
-    --model <MODEL> --language <LANGUAGE> \
-    --speaker-detection --speaker-count <N> \
-    --device <DEVICE> --compute-type <COMPUTE_TYPE>
-```
-
-The full list of model configurations (with **defaults in bold**):
-
-![Model Configurations](docs/images/model_configurations.png)
-
-> 💡 **Distilled models** (e.g. `faster-distil-english`) need an explicit
-> `--language` flag since they are single-language only.
-
-### Manage models manually
-
-```bash
-aTrain init                # download the required models in one go
-aTrain_core load <MODEL>   # download a specific model
-aTrain_core load all       # download every supported model
-aTrain_core remove <MODEL> # delete a specific model
-```
-
-## Roadmap and Upcoming Features
-
-Planned in the near future.
-- Batch Processing, allowing to have files queued for transcription
-- Add options for more verbatim output
-- Make adding custom models more easy
-- MacOS installers
-- Somehow getting that flatpak package to work **Published 1.4.1 on Flathub.
-- Customization of output naming
-- Allowing users to setting the output directory
-- Allow for saving settings and defaults (currently resets after each transcription)  **Implemented in v1.4.0
+| Model                   | Languages                | Licence    | Size    |
+| ----------------------- | ------------------------ | ---------- | ------- |
+| `large-v3`              | all                      | MIT        | 3.09 GB |
+| `large-v3-turbo`        | all                      | MIT        | 1.62 GB |
+| `large-v2`, `large-v1`  | all                      | MIT        | 3.09 GB |
+| `medium`                | all                      | MIT        | 1.53 GB |
+| `small`                 | all                      | MIT        | 486 MB  |
+| `base`                  | all                      | MIT        | 148 MB  |
+| `tiny`                  | all                      | MIT        | 78 MB   |
+| `faster-distil-english` | English                  | MIT        | 1.52 GB |
+| `large-norwegian`       | Norwegian, English       | Apache-2.0 | 6.18 GB |
+| `large-swedish`         | Swedish                  | Apache-2.0 | 3.09 GB |
+| `speaker-detection`     | used for speaker labels  | CC-BY-4.0  | 34 MB   |
 
 ## Documentation
 
-Full user documentation lives in [`docs/`](docs/README.md):
+- [docs/fork.md](docs/fork.md): what this fork changes, and its roadmap.
+- [docs/internal-model-source.md](docs/internal-model-source.md): loading
+  models from an internal source, for administrators.
+- [docs/tutorials.md](docs/tutorials.md): importing transcripts into MAXQDA and
+  NVivo.
 
-- [Installation (end users)](docs/installation.md) — packaged apps and pip.
-- [Linux installation](docs/installation-linux.md) — manual Ubuntu / Debian setup.
-- [Tutorials](docs/tutorials.md) — importing aTrain output into MAXQDA and NVivo.
+The rest of the `docs/` folder comes from aTrain. Pages about installers, app
+stores, code signing and verifying releases describe aTrain's official
+packages and do not apply to this fork.
 
-## For contributors
+## Credits and licence
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for local development setup, building a
-standalone executable, and the branching model. aTrain uses
-[uv](https://docs.astral.sh/uv/) as its recommended package manager.
+PolyglotXprs is based on aTrain by Armin Haberl, Jürgen Fleiß, Dominik Kowald
+and Stefan Thalmann (Business Analytics and Data Science-Center, University of
+Graz, and Know-Center Graz). If you use it in research, please cite their
+paper:
 
-## Attribution
-The GIFs and Icons in aTrain are from [tenor](https://tenor.com/) and [flaticon](https://www.flaticon.com/).
+> Haberl, A., Fleiß, J., Kowald, D., & Thalmann, S. (2024). Take the aTrain.
+> Introducing an interface for the Accessible Transcription of Interviews.
+> *Journal of Behavioral and Experimental Finance*.
+> https://doi.org/10.1016/j.jbef.2024.100891
 
-Free code signing provided by [SignPath.io](https://signpath.io), certificate by [SignPath Foundation](https://signpath.org).
+Licensed under the GNU Affero General Public License v3.0 or later, like
+aTrain; see [LICENSE](LICENSE). The models have their own licences, listed
+above.
+
+The GIFs and icons in the interface are from [tenor](https://tenor.com/) and
+[flaticon](https://www.flaticon.com/).
